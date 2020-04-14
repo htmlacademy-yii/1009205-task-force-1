@@ -2,39 +2,38 @@
 
 require_once 'TaskStatus.php';
 
-$obj = new TaskStatus(1, null, 'account_customer');
+$obj = new TaskStatus(1, null);
 
 assert($obj->getNextStatus(TaskStatus::ACTION_CANCEL) == TaskStatus::STATUS_CANCELLED, 'cancel action');
 assert($obj->getNextStatus(TaskStatus::ACTION_SELECT) == TaskStatus::STATUS_IN_PROGRESS, 'select action');
 assert($obj->getNextStatus(TaskStatus::ACTION_REJECT) == TaskStatus::STATUS_FAILED, 'reject action');
 assert($obj->getNextStatus(TaskStatus::ACTION_IS_DONE) == TaskStatus::STATUS_IS_DONE, 'is done action');
 
-// FOR CUSTOMER ACCOUNT TYPE
+// for Customer
 
 $obj->setStatus(TaskStatus::STATUS_NEW);
-assert($obj->getAvailableActions() == TaskStatus::ACTION_CANCEL, 'customer status new');
+assert($obj->getAvailableActionsCustomer() == TaskStatus::ACTION_CANCEL, 'customer status new');
 $obj->setStatus(TaskStatus::STATUS_IN_PROGRESS);
-assert($obj->getAvailableActions() == TaskStatus::ACTION_IS_DONE, 'customer status new');
+assert($obj->getAvailableActionsCustomer() == TaskStatus::ACTION_IS_DONE, 'customer status new');
 $obj->setStatus(TaskStatus::STATUS_IS_DONE);
-assert($obj->getAvailableActions() == null, 'customer status is done');
+assert($obj->getAvailableActionsCustomer() == null, 'customer status is done');
 $obj->setStatus(TaskStatus::STATUS_CANCELLED);
-assert($obj->getAvailableActions() == null, 'customer status cancelled');
+assert($obj->getAvailableActionsCustomer() == null, 'customer status cancelled');
 $obj->setStatus(TaskStatus::STATUS_FAILED);
-assert($obj->getAvailableActions() == null, 'customer status failed');
+assert($obj->getAvailableActionsCustomer() == null, 'customer status failed');
 
-// FOR executor ACCOUNT TYPE
+// for Executor
 
-$obj = new TaskStatus(1, null, 'account_executor');
 $obj->setStatus(TaskStatus::STATUS_NEW);
-assert($obj->getAvailableActions() == TaskStatus::ACTION_RESPONSE, 'executor status new');
+assert($obj->getAvailableActionsExecutor() == TaskStatus::ACTION_RESPONSE, 'executor status new');
 $obj->setStatus(TaskStatus::STATUS_IN_PROGRESS);
-assert($obj->getAvailableActions() == TaskStatus::ACTION_REJECT, 'executor status in progress');
+assert($obj->getAvailableActionsExecutor() == TaskStatus::ACTION_REJECT, 'executor status in progress');
 $obj->setStatus(TaskStatus::STATUS_IS_DONE);
-assert($obj->getAvailableActions() == null, 'customer status is done');
+assert($obj->getAvailableActionsExecutor() == null, 'customer status is done');
 $obj->setStatus(TaskStatus::STATUS_CANCELLED);
-assert($obj->getAvailableActions() == null, 'customer status cancelled');
+assert($obj->getAvailableActionsExecutor() == null, 'customer status cancelled');
 $obj->setStatus(TaskStatus::STATUS_FAILED);
-assert($obj->getAvailableActions() == null, 'customer status failed');
+assert($obj->getAvailableActionsExecutor() == null, 'customer status failed');
 
 
 

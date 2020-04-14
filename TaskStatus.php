@@ -6,7 +6,6 @@ class TaskStatus
     public $currentStatus;
     private $customerId;
     private $executorId;
-    private $accountType;
     const STATUS_NEW = 'new';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_IN_PROGRESS = 'in_progress';
@@ -17,77 +16,72 @@ class TaskStatus
     const ACTION_SELECT = 'action_select';
     const ACTION_REJECT = 'action_reject';
     const ACTION_IS_DONE = 'action_is_done';
-    const ACCOUNT_CUSTOMER = 'account_customer';
-    const ACCOUNT_EXECUTOR = 'account_executor';
 
-    public function __construct($customerId, $executorId, $accountType)
+    public function __construct($customerId, $executorId)
     {
         $this->customerId = $customerId;
-        $this->executorId= $executorId;
-        $this->accountType = $accountType;
+        $this->executorId = $executorId;
     }
 
-    public function setStatus($newStatus){
+    public function setStatus($newStatus)
+    {
         $this->currentStatus = $newStatus;
     }
 
- // Определяет след. статус для действия
+    // Определяет след. статус для действия
     public function getNextStatus($action)
     {
-        $nextStatus = null;
         switch ($action) {
             case self::ACTION_CANCEL:
-                $nextStatus = self::STATUS_CANCELLED;
-                break;
+                return self::STATUS_CANCELLED;
             case self::ACTION_SELECT:
-                $nextStatus = self::STATUS_IN_PROGRESS;
-                break;
+                return self::STATUS_IN_PROGRESS;
             case self::ACTION_REJECT:
-                $nextStatus = self::STATUS_FAILED;
-                break;
+                return self::STATUS_FAILED;
             case  self::ACTION_IS_DONE:
-                $nextStatus = self::STATUS_IS_DONE;
-                break;
+                return self::STATUS_IS_DONE;
+            default:
+                return null;
         }
-        return $nextStatus;
     }
 
 // Определяет доступные действия для конкретного статуса
-    public function getAvailableActions()
+    public function getAvailableActionsCustomer()
     {
         $availableAction = null;
-        if ($this->accountType == self::ACCOUNT_CUSTOMER) {
-            switch ($this->currentStatus) {
-                case self::STATUS_NEW:
-                    $availableAction = self::ACTION_CANCEL;
-                    break;
-                case  self::STATUS_IN_PROGRESS:
-                    $availableAction = self::ACTION_IS_DONE;
-                    break;
-                case self::STATUS_IS_DONE || self::STATUS_FAILED || self::STATUS_CANCELLED:
-                    $availableAction = null;
-            }
-            return $availableAction;
-        } elseif ($this->accountType == self::ACCOUNT_EXECUTOR
-
-        ) {
-            switch ($this->currentStatus) {
-                case self::STATUS_NEW:
-                    $availableAction = self::ACTION_RESPONSE;
-                    break;
-                case self::STATUS_IN_PROGRESS:
-                    $availableAction = self::ACTION_REJECT;
-                    break;
-                case self::STATUS_IS_DONE || self::STATUS_FAILED || self::STATUS_CANCELLED:
-                    $availableAction = null;
-                    break;
-            }
+        switch ($this->currentStatus) {
+            case self::STATUS_NEW:
+                $availableAction = self::ACTION_CANCEL;
+                break;
+            case  self::STATUS_IN_PROGRESS:
+                $availableAction = self::ACTION_IS_DONE;
+                break;
+            default:
+                $availableAction = null;
         }
         return $availableAction;
     }
 
-    // карта статусов
-    public function statusesList()
+    public function getAvailableActionsExecutor()
+    {
+        $availableAction = null;
+        switch ($this->currentStatus) {
+            case self::STATUS_NEW:
+                $availableAction = self::ACTION_RESPONSE;
+                break;
+            case self::STATUS_IN_PROGRESS:
+                $availableAction = self::ACTION_REJECT;
+                break;
+            default:
+                $availableAction = null;
+                break;
+        }
+        return $availableAction;
+    }
+
+// карта статусов
+    public
+    function statusesList()
     {
         {
             $array = [
@@ -102,7 +96,8 @@ class TaskStatus
     }
 
 //карта действий
-    public function actionList()
+    public
+    function actionList()
     {
         {
             $array = [
@@ -114,7 +109,8 @@ class TaskStatus
             return $array;
         }
     }
-    // Определяет след. Доступный статус
+
+// Определяет след. Доступный статус
 //    public function getAvailableStatuses()
 //    {
 //        $availableStatus = [];
