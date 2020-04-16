@@ -1,0 +1,15 @@
+{
+  "name": "alemu/1009205-task-force-1",
+  "authors": [
+    {
+      "name": "Justtoobusy",
+      "email": "alemu@mail.ru"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "HtmlAcademy\\": "src/"
+    }
+  }
+}
