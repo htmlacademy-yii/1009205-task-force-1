@@ -3,7 +3,7 @@
 
 class TaskStatus
 {
-    public $currentStatus;
+    private $currentStatus;
     private $customerId;
     private $executorId;
     const STATUS_NEW = 'new';
@@ -29,7 +29,7 @@ class TaskStatus
     }
 
     // Определяет след. статус для действия
-    public function getNextStatus($action)
+    public function getNextStatus($action): string
     {
         switch ($action) {
             case self::ACTION_CANCEL:
@@ -40,13 +40,21 @@ class TaskStatus
                 return self::STATUS_FAILED;
             case  self::ACTION_IS_DONE:
                 return self::STATUS_IS_DONE;
-            default:
-                return null;
         }
+        throw new RuntimeException('action:' . $action . ' does not change status');
     }
 
 // Определяет доступные действия для конкретного статуса
-    public function getAvailableActionsCustomer()
+    public function getAvailableActions(bool $isCustomer = true):?string
+    {
+        if ($isCustomer) {
+            return $this->getAvailableActionsCustomer();
+        } else {
+            return $this->getAvailableActionsExecutor();
+        }
+    }
+
+    private function getAvailableActionsCustomer():?string
     {
         $availableAction = null;
         switch ($this->currentStatus) {
@@ -62,7 +70,7 @@ class TaskStatus
         return $availableAction;
     }
 
-    public function getAvailableActionsExecutor()
+    private function getAvailableActionsExecutor():?string
     {
         $availableAction = null;
         switch ($this->currentStatus) {
@@ -80,51 +88,31 @@ class TaskStatus
     }
 
 // карта статусов
-    public
-    function statusesList()
+    public function statusesList():array
+
     {
-        {
-            $array = [
-                self::STATUS_IN_PROGRESS => 'В работе',
-                self::STATUS_NEW => 'Новое',
-                self::STATUS_CANCELLED => 'Отменено',
-                self::STATUS_FAILED => 'Провалено',
-                self::STATUS_IS_DONE => 'Выполнено'
-            ];
-            return $array;
-        }
+        $array = [
+            self::STATUS_IN_PROGRESS => 'В работе',
+            self::STATUS_NEW => 'Новое',
+            self::STATUS_CANCELLED => 'Отменено',
+            self::STATUS_FAILED => 'Провалено',
+            self::STATUS_IS_DONE => 'Выполнено'
+        ];
+        return $array;
     }
+
 
 //карта действий
-    public
-    function actionList()
-    {
-        {
-            $array = [
-                self::ACTION_REJECT => 'Отказаться',
-                self::ACTION_RESPONSE => 'Откликнуться',
-                self::ACTION_IS_DONE => 'Выполнено',
-                self::ACTION_CANCEL => 'Отменить'
-            ];
-            return $array;
-        }
-    }
+    public function actionList():array
 
-// Определяет след. Доступный статус
-//    public function getAvailableStatuses()
-//    {
-//        $availableStatus = [];
-//        switch ($this->currentStatus) {
-//            case self::STATUS_NEW:
-//                $availableStatus = [self::STATUS_CANCELLED, self::STATUS_IN_PROGRESS];
-//                break;
-//            case self::STATUS_IN_PROGRESS:
-//                $availableStatus = [self::STATUS_FAILED, self::STATUS_IS_DONE];
-//                break;
-//            case self::STATUS_CANCELLED || self::STATUS_IS_DONE || self::STATUS_FAILED:
-//                $availableStatus = null;
-//                break;
-//        }
-//        return $availableStatus;
-//    }
+    {
+        $array = [
+            self::ACTION_REJECT => 'Отказаться',
+            self::ACTION_RESPONSE => 'Откликнуться',
+            self::ACTION_IS_DONE => 'Выполнено',
+            self::ACTION_CANCEL => 'Отменить'
+        ];
+        return $array;
+    }
 }
+
