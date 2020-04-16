@@ -28,7 +28,7 @@ class TaskStatus
         $this->currentStatus = $newStatus;
     }
 
-    // Определяет след. статус для действия
+    // Определяет след. статус для конкретного действия
     public function getNextStatus($action): string
     {
         switch ($action) {

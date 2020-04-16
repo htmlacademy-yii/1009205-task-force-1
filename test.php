@@ -14,7 +14,6 @@ try {
 echo $e->getMessage();
 }
 
-
 // for Customer
 
 $task->setStatus(TaskStatus::STATUS_NEW);
