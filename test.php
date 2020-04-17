@@ -1,8 +1,7 @@
 <?php
-
-require_once 'TaskStatus.php';
-
-$task = new TaskStatus(1, null);
+require_once 'vendor/autoload.php';
+use HtmlAcademy\BusinessLogic\TaskStatus;
+$task = new TaskStatus(1,null);
 
 assert($task->getNextStatus(TaskStatus::ACTION_CANCEL) == TaskStatus::STATUS_CANCELLED, 'cancel action');
 assert($task->getNextStatus(TaskStatus::ACTION_SELECT) == TaskStatus::STATUS_IN_PROGRESS, 'select action');
