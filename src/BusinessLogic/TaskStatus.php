@@ -1,10 +1,14 @@
 <?php
+
 namespace HtmlAcademy\BusinessLogic;
+
 use RuntimeException;
+
 
 class TaskStatus
 {
     private $currentStatus;
+    private $currentUserId;
     private $customerId;
     private $executorId;
     const STATUS_NEW = 'new';
@@ -18,10 +22,11 @@ class TaskStatus
     const ACTION_REJECT = 'action_reject';
     const ACTION_IS_DONE = 'action_is_done';
 
-    public function __construct($customerId, $executorId)
+    public function __construct($currentUserId,$customerId, $executorId)
     {
         $this->customerId = $customerId;
         $this->executorId = $executorId;
+        $this->currentUserId = $currentUserId;
     }
 
     public function setStatus($newStatus)
@@ -46,50 +51,32 @@ class TaskStatus
     }
 
 // Определяет доступные действия для конкретного статуса
-    public function getAvailableActions(bool $isCustomer = true):?string
-    {
-        if ($isCustomer) {
-            return $this->getAvailableActionsCustomer();
-        } else {
-            return $this->getAvailableActionsExecutor();
-        }
-    }
-
-    private function getAvailableActionsCustomer():?string
+     public function getAvailableActions():? object
     {
         $availableAction = null;
         switch ($this->currentStatus) {
             case self::STATUS_NEW:
-                $availableAction = self::ACTION_CANCEL;
-                break;
+                if (CancelAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true) {
+                    $availableAction = new CancelAction();
+                } elseif (ResponseAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true)
+                {
+                    $availableAction = new ResponseAction();
+                }
+                    break;
             case  self::STATUS_IN_PROGRESS:
-                $availableAction = self::ACTION_IS_DONE;
+                if (IsDoneAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true) {
+                    $availableAction = new IsDoneAction();
+                } elseif (RejectAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true){
+                    $availableAction = new RejectAction();
+                }
                 break;
             default:
-                $availableAction = null;
+                throw new RuntimeException('You have no available actions for current status: '. $this->currentStatus. '  ');
         }
         return $availableAction;
     }
-
-    private function getAvailableActionsExecutor():?string
-    {
-        $availableAction = null;
-        switch ($this->currentStatus) {
-            case self::STATUS_NEW:
-                $availableAction = self::ACTION_RESPONSE;
-                break;
-            case self::STATUS_IN_PROGRESS:
-                $availableAction = self::ACTION_REJECT;
-                break;
-            default:
-                $availableAction = null;
-                break;
-        }
-        return $availableAction;
-    }
-
 // карта статусов
-    public function statusesList():array
+    public function statusesList(): array
 
     {
         $array = [
@@ -104,16 +91,28 @@ class TaskStatus
 
 
 //карта действий
-    public function actionList():array
+    public function actionList(): array
 
     {
         $array = [
             self::ACTION_REJECT => 'Отказаться',
             self::ACTION_RESPONSE => 'Откликнуться',
             self::ACTION_IS_DONE => 'Выполнено',
-            self::ACTION_CANCEL => 'Отменить'
+            self::ACTION_CANCEL => 'Отменить',
+            self::ACTION_SELECT => 'Принять'
         ];
         return $array;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
