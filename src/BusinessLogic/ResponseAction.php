@@ -7,21 +7,21 @@ namespace HtmlAcademy\BusinessLogic;
 class ResponseAction extends AbstractAction
 {
 
-    public function ActionTitle()
+    public static function ActionTitle()
     {
         return 'Откликнуться';
     }
 
-    public function ActionInternalName()
+    public static function ActionInternalName()
     {
         return 'action_response';
     }
 
     public static function UserType($currentUserId,$customerId,$executorId)
     {
-        if ($currentUserId === $executorId)
+        if ($currentUserId === $executorId) {
             return true;
-        else {
+        } else {
             return false;
         }
     }

@@ -4,21 +4,21 @@
 namespace HtmlAcademy\BusinessLogic;
 
 
-class RejectAction extends AbstractAction
+class SelectAction
 {
     public static function ActionTitle()
     {
-        return 'Отказаться';
+        return 'Принять';
     }
 
     public static function ActionInternalName()
     {
-        return 'action_reject';
+        return 'action_select';
     }
 
     public static function UserType($currentUserId,$customerId,$executorId)
     {
-        if ($currentUserId === $executorId) {
+        if ($currentUserId === $customerId) {
             return true;
         } else {
             return false;

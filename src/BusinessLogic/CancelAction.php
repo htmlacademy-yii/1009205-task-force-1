@@ -6,12 +6,12 @@ namespace HtmlAcademy\BusinessLogic;
 
 class CancelAction extends AbstractAction
 {
-    public function ActionTitle()
+    public static function ActionTitle()
     {
         return 'Отменить';
     }
 
-    public function ActionInternalName()
+    public static function ActionInternalName()
     {
         return 'action_cancel';
     }

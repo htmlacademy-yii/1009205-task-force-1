@@ -6,12 +6,12 @@ namespace HtmlAcademy\BusinessLogic;
 
 class IsDoneAction extends AbstractAction
 {
-    public function ActionTitle()
+    public static function ActionTitle()
     {
         return 'Выполнено';
     }
 
-    public function ActionInternalName()
+    public static function ActionInternalName()
     {
         return 'action_is_done';
     }

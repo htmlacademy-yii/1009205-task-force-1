@@ -11,18 +11,20 @@ class TaskStatus
     private $currentUserId;
     private $customerId;
     private $executorId;
+    const CUSTOMER = 'customer';
+    const EXECUTOR = 'executor';
     const STATUS_NEW = 'new';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_IS_DONE = 'is_done';
     const STATUS_FAILED = 'failed';
-    const ACTION_CANCEL = 'action_cancel';
-    const ACTION_RESPONSE = 'action_response';
-    const ACTION_SELECT = 'action_select';
-    const ACTION_REJECT = 'action_reject';
-    const ACTION_IS_DONE = 'action_is_done';
+    const ACTION_CANCEL = CancelAction::class;
+    const ACTION_RESPONSE = ResponseAction::class;
+    const ACTION_REJECT = RejectAction::class;
+    const ACTION_IS_DONE = IsDoneAction::class;
+    const ACTION_SELECT = SelectAction::class;
 
-    public function __construct($currentUserId,$customerId, $executorId)
+    public function __construct($currentUserId, $customerId, $executorId)
     {
         $this->customerId = $customerId;
         $this->executorId = $executorId;
@@ -51,32 +53,42 @@ class TaskStatus
     }
 
 // Определяет доступные действия для конкретного статуса
-     public function getAvailableActions():? object
+    public function getAvailableActions(): ?object
     {
-        $availableAction = null;
-        switch ($this->currentStatus) {
-            case self::STATUS_NEW:
-                if (CancelAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true) {
-                    $availableAction = new CancelAction();
-                } elseif (ResponseAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true)
-                {
-                    $availableAction = new ResponseAction();
-                }
-                    break;
-            case  self::STATUS_IN_PROGRESS:
-                if (IsDoneAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true) {
-                    $availableAction = new IsDoneAction();
-                } elseif (RejectAction::UserType($this->currentUserId,$this->customerId,$this->executorId) === true){
-                    $availableAction = new RejectAction();
-                }
-                break;
-            default:
-                throw new RuntimeException('You have no available actions for current status: '. $this->currentStatus. '  ');
+        $currentStatus = $this->currentStatus;
+        $userType = null;
+        if (CancelAction::UserType($this->currentUserId, $this->customerId, $this->executorId)) {
+            $userType = self::CUSTOMER;
+        } elseif ( ResponseAction::UserType($this->currentUserId, $this->customerId, $this->executorId)){
+            $userType = self::EXECUTOR;
         }
-        return $availableAction;
+        $actions = [
+            self::CUSTOMER => [
+                self::STATUS_NEW => self::ACTION_CANCEL,
+                self::STATUS_IN_PROGRESS => self::ACTION_IS_DONE,
+                self::STATUS_IS_DONE => null,
+                self::STATUS_CANCELLED => null,
+                self::STATUS_FAILED => null
+            ],
+            self::EXECUTOR => [
+                self::STATUS_NEW => self::ACTION_RESPONSE,
+                self::STATUS_IN_PROGRESS => self::ACTION_REJECT,
+                self::STATUS_IS_DONE => null,
+                self::STATUS_CANCELLED => null,
+                self::STATUS_FAILED => null
+            ]
+        ];
+        $availableAction = $actions[$userType][$currentStatus];
+        if ($availableAction != null) {
+            return new $availableAction;
+        } else {
+            throw new RuntimeException('You have no available actions for current status: ' . $currentStatus . '  ');
+        }
     }
+
 // карта статусов
-    public function statusesList(): array
+    public
+    function statusesList(): array
 
     {
         $array = [
@@ -91,7 +103,8 @@ class TaskStatus
 
 
 //карта действий
-    public function actionList(): array
+    public
+    function actionList(): array
 
     {
         $array = [

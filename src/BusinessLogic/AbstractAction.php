@@ -10,9 +10,9 @@ abstract class AbstractAction
     protected $customerId;
     protected $executorId;
 
-    abstract protected function ActionTitle();
+    abstract protected static function ActionTitle();
 
-    abstract protected function ActionInternalName();
+    abstract protected static function ActionInternalName();
 
     abstract protected static function UserType($currentUserId,$customerId,$executorId);
 }
