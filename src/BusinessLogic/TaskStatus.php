@@ -62,12 +62,15 @@ class TaskStatus
             ResponseAction::class => ResponseAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)
         ];
         foreach ($actions as $key => $action) {
-            if ($action == true) {
-                $availableActions = $key;
+            if ($action) {
+                $availableActions[] = $key;
             }
         }
-        if ($availableActions != null) {
-            return new $availableActions;
+        if (!empty($availableActions)) {
+            foreach ($availableActions as $availableAction)
+            {
+                return new $availableAction;
+            }
         } else {
             throw new RuntimeException('You have no available actions for current status: ' . $currentStatus . '  ');
         }
