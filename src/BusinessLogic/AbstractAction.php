@@ -14,6 +14,6 @@ abstract class AbstractAction
 
     abstract protected static function ActionInternalName();
 
-    abstract protected static function UserType($currentUserId,$customerId,$executorId);
+    abstract protected static function AccessVerification($currentUserId,$customerId,$executorId,$currentStatus);
 }
 

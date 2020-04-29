@@ -11,8 +11,6 @@ class TaskStatus
     private $currentUserId;
     private $customerId;
     private $executorId;
-    const CUSTOMER = 'customer';
-    const EXECUTOR = 'executor';
     const STATUS_NEW = 'new';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_IN_PROGRESS = 'in_progress';
@@ -22,7 +20,7 @@ class TaskStatus
     const ACTION_RESPONSE = ResponseAction::class;
     const ACTION_REJECT = RejectAction::class;
     const ACTION_IS_DONE = IsDoneAction::class;
-    const ACTION_SELECT = SelectAction::class;
+    const ACTION_SELECT = 'action_select';
 
     public function __construct($currentUserId, $customerId, $executorId)
     {
@@ -55,32 +53,21 @@ class TaskStatus
 // Определяет доступные действия для конкретного статуса
     public function getAvailableActions(): ?object
     {
+        $availableActions = [];
         $currentStatus = $this->currentStatus;
-        $userType = null;
-        if (CancelAction::UserType($this->currentUserId, $this->customerId, $this->executorId)) {
-            $userType = self::CUSTOMER;
-        } elseif ( ResponseAction::UserType($this->currentUserId, $this->customerId, $this->executorId)){
-            $userType = self::EXECUTOR;
-        }
         $actions = [
-            self::CUSTOMER => [
-                self::STATUS_NEW => self::ACTION_CANCEL,
-                self::STATUS_IN_PROGRESS => self::ACTION_IS_DONE,
-                self::STATUS_IS_DONE => null,
-                self::STATUS_CANCELLED => null,
-                self::STATUS_FAILED => null
-            ],
-            self::EXECUTOR => [
-                self::STATUS_NEW => self::ACTION_RESPONSE,
-                self::STATUS_IN_PROGRESS => self::ACTION_REJECT,
-                self::STATUS_IS_DONE => null,
-                self::STATUS_CANCELLED => null,
-                self::STATUS_FAILED => null
-            ]
+            CancelAction::class => CancelAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
+            IsDoneAction::class => IsDoneAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
+            RejectAction::class => RejectAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
+            ResponseAction::class => ResponseAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)
         ];
-        $availableAction = $actions[$userType][$currentStatus];
-        if ($availableAction != null) {
-            return new $availableAction;
+        foreach ($actions as $key => $action) {
+            if ($action == true) {
+                $availableActions = $key;
+            }
+        }
+        if ($availableActions != null) {
+            return new $availableActions;
         } else {
             throw new RuntimeException('You have no available actions for current status: ' . $currentStatus . '  ');
         }
@@ -112,7 +99,6 @@ class TaskStatus
             self::ACTION_RESPONSE => 'Откликнуться',
             self::ACTION_IS_DONE => 'Выполнено',
             self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_SELECT => 'Принять'
         ];
         return $array;
     }

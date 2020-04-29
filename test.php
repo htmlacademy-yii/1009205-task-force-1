@@ -17,11 +17,11 @@ try {
     assert($task->getAvailableActions() == new IsDoneAction(), 'in progress status error Customer');
     $task->setStatus(TaskStatus::STATUS_IS_DONE);
     assert($task->getAvailableActions() == new ResponseAction(), 'is done status error Customer');
-} catch (Exception $e){
-    echo $e->getMessage()."\n";
+} catch (Exception $e) {
+    echo $e->getMessage() . "\n";
 
 }
- // for Executor
+// for Executor
 $task = new TaskStatus(2, 1, 2);
 try {
     $task->setStatus(TaskStatus::STATUS_NEW);
@@ -30,8 +30,8 @@ try {
     assert($task->getAvailableActions() == new RejectAction(), 'in progress status error Executor');
     $task->setStatus(TaskStatus::STATUS_FAILED);
     assert($task->getAvailableActions() == new RejectAction(), 'failed status error Executor');
-} catch (Exception $e){
-    echo $e->getMessage()."\n";
+} catch (Exception $e) {
+    echo $e->getMessage() . "\n";
 }
 
 assert($task->getNextStatus(TaskStatus::ACTION_CANCEL) == TaskStatus::STATUS_CANCELLED, 'cancel action');

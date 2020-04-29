@@ -6,6 +6,7 @@ namespace HtmlAcademy\BusinessLogic;
 
 class IsDoneAction extends AbstractAction
 {
+    const STATUS_IN_PROGRESS = 'in_progress';
     public static function ActionTitle()
     {
         return 'Выполнено';
@@ -16,9 +17,9 @@ class IsDoneAction extends AbstractAction
         return 'action_is_done';
     }
 
-    public static function UserType($currentUserId,$customerId,$executorId)
+    public static function AccessVerification($currentUserId,$customerId,$executorId,$currentStatus)
     {
-        if ($currentUserId === $customerId) {
+        if ($currentUserId === $customerId && $currentStatus === self::STATUS_IN_PROGRESS) {
             return true;
         } else {
             return false;
