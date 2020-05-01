@@ -19,7 +19,6 @@ try {
     assert($task->getAvailableActions() == new ResponseAction(), 'is done status error Customer');
 } catch (Exception $e) {
     echo $e->getMessage() . "\n";
-
 }
 // for Executor
 $task = new TaskStatus(2, 1, 2);

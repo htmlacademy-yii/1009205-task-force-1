@@ -4,7 +4,6 @@ namespace HtmlAcademy\BusinessLogic;
 
 use RuntimeException;
 
-
 class TaskStatus
 {
     private $currentStatus;
@@ -56,29 +55,24 @@ class TaskStatus
         $availableActions = [];
         $currentStatus = $this->currentStatus;
         $actions = [
-            CancelAction::class => CancelAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
-            IsDoneAction::class => IsDoneAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
-            RejectAction::class => RejectAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus),
-            ResponseAction::class => ResponseAction::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)
+            new CancelAction(),
+            new IsDoneAction(),
+            new RejectAction(),
+            new ResponseAction()
         ];
-        foreach ($actions as $key => $action) {
-            if ($action) {
-                $availableActions[] = $key;
+        foreach ($actions as $action) {
+            if ($action::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)) {
+                $availableActions[] = $action;
             }
         }
-        if (!empty($availableActions)) {
-            foreach ($availableActions as $availableAction)
-            {
-                return new $availableAction;
-            }
-        } else {
+        if (empty($availableActions)) {
             throw new RuntimeException('You have no available actions for current status: ' . $currentStatus . '  ');
         }
+        return $availableActions[0];
     }
 
 // карта статусов
-    public
-    function statusesList(): array
+    public function statusesList(): array
 
     {
         $array = [
@@ -87,21 +81,6 @@ class TaskStatus
             self::STATUS_CANCELLED => 'Отменено',
             self::STATUS_FAILED => 'Провалено',
             self::STATUS_IS_DONE => 'Выполнено'
-        ];
-        return $array;
-    }
-
-
-//карта действий
-    public
-    function actionList(): array
-
-    {
-        $array = [
-            self::ACTION_REJECT => 'Отказаться',
-            self::ACTION_RESPONSE => 'Откликнуться',
-            self::ACTION_IS_DONE => 'Выполнено',
-            self::ACTION_CANCEL => 'Отменить',
         ];
         return $array;
     }
