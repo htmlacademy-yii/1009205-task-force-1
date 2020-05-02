@@ -4,6 +4,7 @@ namespace HtmlAcademy\BusinessLogic;
 
 use RuntimeException;
 
+
 class TaskStatus
 {
     private $currentStatus;
@@ -53,12 +54,11 @@ class TaskStatus
     public function getAvailableActions(): ?object
     {
         $availableActions = [];
-        $currentStatus = $this->currentStatus;
         $actions = [
-            new CancelAction(),
-            new IsDoneAction(),
-            new RejectAction(),
-            new ResponseAction()
+            CancelAction::class,
+            IsDoneAction::class,
+            RejectAction::class,
+            ResponseAction::class
         ];
         foreach ($actions as $action) {
             if ($action::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)) {
@@ -66,9 +66,9 @@ class TaskStatus
             }
         }
         if (empty($availableActions)) {
-            throw new RuntimeException('You have no available actions for current status: ' . $currentStatus . '  ');
+            return null;
         }
-        return $availableActions[0];
+        return new $availableActions[0];
     }
 
 // карта статусов
