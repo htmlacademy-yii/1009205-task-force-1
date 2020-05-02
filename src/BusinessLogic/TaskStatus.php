@@ -51,7 +51,7 @@ class TaskStatus
     }
 
 // Определяет доступные действия для конкретного статуса
-    public function getAvailableActions(): ?object
+    public function getAvailableActions(): array
     {
         $availableActions = [];
         $actions = [
@@ -62,13 +62,10 @@ class TaskStatus
         ];
         foreach ($actions as $action) {
             if ($action::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)) {
-                $availableActions[] = $action;
+                $availableActions[] = new $action;
             }
         }
-        if (empty($availableActions)) {
-            return null;
-        }
-        return new $availableActions[0];
+        return $availableActions;
     }
 
 // карта статусов
