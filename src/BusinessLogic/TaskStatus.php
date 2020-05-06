@@ -16,11 +16,17 @@ class TaskStatus
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_IS_DONE = 'is_done';
     const STATUS_FAILED = 'failed';
+    const ACTION_SELECT = 'action_select';
     const ACTION_CANCEL = CancelAction::class;
     const ACTION_RESPONSE = ResponseAction::class;
     const ACTION_REJECT = RejectAction::class;
     const ACTION_IS_DONE = IsDoneAction::class;
-    const ACTION_SELECT = 'action_select';
+    private array $actions = [
+       self::ACTION_CANCEL,
+       self::ACTION_RESPONSE,
+       self::ACTION_REJECT,
+       self::ACTION_IS_DONE
+    ];
 
     public function __construct($currentUserId, $customerId, $executorId)
     {
@@ -54,15 +60,9 @@ class TaskStatus
     public function getAvailableActions(): array
     {
         $availableActions = [];
-        $actions = [
-            CancelAction::class,
-            IsDoneAction::class,
-            RejectAction::class,
-            ResponseAction::class
-        ];
-        foreach ($actions as $action) {
+        foreach ($this->actions as $action) {
             if ($action::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)) {
-                $availableActions[] = new $action;
+                $availableActions[] = $action;
             }
         }
         return $availableActions;
