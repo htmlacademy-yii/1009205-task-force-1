@@ -3,7 +3,8 @@
 namespace HtmlAcademy\BusinessLogic;
 
 use HtmlAcademy\Exceptions\InputException;
-use RuntimeException;
+use HtmlAcademy\Exceptions\UselessException;
+
 
 
 class TaskStatus
@@ -60,7 +61,7 @@ class TaskStatus
                 case  self::ACTION_IS_DONE:
                     return self::STATUS_IS_DONE;
             }
-            throw new RuntimeException('action:' . $action . ' does not change status' .  "\n");
+            throw new UselessException('action:' . $action . ' does not change status' .  "\n");
         }
     }
 
