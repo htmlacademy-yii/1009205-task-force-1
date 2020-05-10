@@ -1,10 +1,14 @@
 <?php
+
 namespace HtmlAcademy\BusinessLogic;
+
 use RuntimeException;
+
 
 class TaskStatus
 {
     private $currentStatus;
+    private $currentUserId;
     private $customerId;
     private $executorId;
     const STATUS_NEW = 'new';
@@ -12,16 +16,23 @@ class TaskStatus
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_IS_DONE = 'is_done';
     const STATUS_FAILED = 'failed';
-    const ACTION_CANCEL = 'action_cancel';
-    const ACTION_RESPONSE = 'action_response';
     const ACTION_SELECT = 'action_select';
-    const ACTION_REJECT = 'action_reject';
-    const ACTION_IS_DONE = 'action_is_done';
+    const ACTION_CANCEL = CancelAction::class;
+    const ACTION_RESPONSE = ResponseAction::class;
+    const ACTION_REJECT = RejectAction::class;
+    const ACTION_IS_DONE = IsDoneAction::class;
+    private array $actions = [
+       self::ACTION_CANCEL,
+       self::ACTION_RESPONSE,
+       self::ACTION_REJECT,
+       self::ACTION_IS_DONE
+    ];
 
-    public function __construct($customerId, $executorId)
+    public function __construct($currentUserId, $customerId, $executorId)
     {
         $this->customerId = $customerId;
         $this->executorId = $executorId;
+        $this->currentUserId = $currentUserId;
     }
 
     public function setStatus($newStatus)
@@ -46,50 +57,19 @@ class TaskStatus
     }
 
 // Определяет доступные действия для конкретного статуса
-    public function getAvailableActions(bool $isCustomer = true):?string
+    public function getAvailableActions(): array
     {
-        if ($isCustomer) {
-            return $this->getAvailableActionsCustomer();
-        } else {
-            return $this->getAvailableActionsExecutor();
+        $availableActions = [];
+        foreach ($this->actions as $action) {
+            if ($action::AccessVerification($this->currentUserId, $this->customerId, $this->executorId, $this->currentStatus)) {
+                $availableActions[] = $action;
+            }
         }
-    }
-
-    private function getAvailableActionsCustomer():?string
-    {
-        $availableAction = null;
-        switch ($this->currentStatus) {
-            case self::STATUS_NEW:
-                $availableAction = self::ACTION_CANCEL;
-                break;
-            case  self::STATUS_IN_PROGRESS:
-                $availableAction = self::ACTION_IS_DONE;
-                break;
-            default:
-                $availableAction = null;
-        }
-        return $availableAction;
-    }
-
-    private function getAvailableActionsExecutor():?string
-    {
-        $availableAction = null;
-        switch ($this->currentStatus) {
-            case self::STATUS_NEW:
-                $availableAction = self::ACTION_RESPONSE;
-                break;
-            case self::STATUS_IN_PROGRESS:
-                $availableAction = self::ACTION_REJECT;
-                break;
-            default:
-                $availableAction = null;
-                break;
-        }
-        return $availableAction;
+        return $availableActions;
     }
 
 // карта статусов
-    public function statusesList():array
+    public function statusesList(): array
 
     {
         $array = [
@@ -101,19 +81,16 @@ class TaskStatus
         ];
         return $array;
     }
-
-
-//карта действий
-    public function actionList():array
-
-    {
-        $array = [
-            self::ACTION_REJECT => 'Отказаться',
-            self::ACTION_RESPONSE => 'Откликнуться',
-            self::ACTION_IS_DONE => 'Выполнено',
-            self::ACTION_CANCEL => 'Отменить'
-        ];
-        return $array;
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
 
