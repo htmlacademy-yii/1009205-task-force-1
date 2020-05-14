@@ -2,7 +2,9 @@
 
 namespace HtmlAcademy\BusinessLogic;
 
-use RuntimeException;
+use HtmlAcademy\Exceptions\InputException;
+use HtmlAcademy\Exceptions\UselessException;
+
 
 
 class TaskStatus
@@ -22,10 +24,10 @@ class TaskStatus
     const ACTION_REJECT = RejectAction::class;
     const ACTION_IS_DONE = IsDoneAction::class;
     private array $actions = [
-       self::ACTION_CANCEL,
-       self::ACTION_RESPONSE,
-       self::ACTION_REJECT,
-       self::ACTION_IS_DONE
+        self::ACTION_CANCEL,
+        self::ACTION_RESPONSE,
+        self::ACTION_REJECT,
+        self::ACTION_IS_DONE,
     ];
 
     public function __construct($currentUserId, $customerId, $executorId)
@@ -34,26 +36,33 @@ class TaskStatus
         $this->executorId = $executorId;
         $this->currentUserId = $currentUserId;
     }
-
-    public function setStatus($newStatus)
+    // задаёт текущий статус задачи
+    public function setStatus(string $newStatus):void
     {
+        if (!array_key_exists($newStatus, $this->statusesList())) {
+            throw new InputException('status ' . $newStatus . ' does not exist' . "\n");
+        }
         $this->currentStatus = $newStatus;
     }
 
     // Определяет след. статус для конкретного действия
-    public function getNextStatus($action): string
+    public function getNextStatus(string $action): ?string
     {
-        switch ($action) {
-            case self::ACTION_CANCEL:
-                return self::STATUS_CANCELLED;
-            case self::ACTION_SELECT:
-                return self::STATUS_IN_PROGRESS;
-            case self::ACTION_REJECT:
-                return self::STATUS_FAILED;
-            case  self::ACTION_IS_DONE:
-                return self::STATUS_IS_DONE;
+        if (!in_array($action, $this->actions)) {
+            throw new InputException('action ' . $action . ' does not exist' . "\n");
+        } else {
+            switch ($action) {
+                case self::ACTION_CANCEL:
+                    return self::STATUS_CANCELLED;
+                case self::ACTION_SELECT:
+                    return self::STATUS_IN_PROGRESS;
+                case self::ACTION_REJECT:
+                    return self::STATUS_FAILED;
+                case  self::ACTION_IS_DONE:
+                    return self::STATUS_IS_DONE;
+            }
+            throw new UselessException('action:' . $action . ' does not change status' .  "\n");
         }
-        throw new RuntimeException('action:' . $action . ' does not change status');
     }
 
 // Определяет доступные действия для конкретного статуса
