@@ -3,11 +3,15 @@
 
 namespace HtmlAcademy\Service;
 
+use HtmlAcademy\Exceptions\InvalidFileException;
+use HtmlAcademy\Exceptions\UselessException;
 use SplFileObject;
+use SplFileInfo;
 
 class CsvToSqlConverter
 {
     private string $path;
+    private SplFileInfo $aboutFile;
     private SplFileObject $file;
     private string $tableName;
     private array $result;
@@ -17,10 +21,17 @@ class CsvToSqlConverter
     public function __construct($path)
     {
         $this->path = $path;
-        $this->file = new SplFileObject($this->path);
-        $this->tableName = strstr($this->file->getFilename(), '.csv', true);
-        $this->result = [];
-        $this->columns = [];
+        $this->aboutFile = new SplFileInfo($this->path);
+        if (!$this->aboutFile->isFile()) {
+            throw new InvalidFileException('selected file does not exist or current path ' . $this->path . ' is wrong');
+        } elseif ($this->aboutFile->getExtension() !== 'csv') {
+            throw new InvalidFileException('Selected file ' . $this->aboutFile->getBasename() . ' is not a csv file');
+        } else {
+            $this->file = $this->aboutFile->openFile();
+            $this->tableName = strstr($this->file->getFilename(), '.csv', true);
+            $this->result = [];
+            $this->columns = [];
+        }
     }
 
     public function CsvParser(): void
@@ -29,12 +40,14 @@ class CsvToSqlConverter
             $rows[] = $this->file->fgetcsv();
         }
         $this->columns = array_shift($rows);
-        //вырезаем пустые последние строки
-        array_pop($rows);
-        foreach ($rows as $row) {
-            $this->result[] = $row;
+        foreach ($rows as $key => $value) {
+            if (!empty(array_filter($value))) {
+                $this->result[] = $value;
+            }
         }
-
+        if (empty($this->result)) {
+            throw new UselessException('Selected csv file ' . $this->aboutFile->getBasename() . ' is empty');
+        }
     }
 
     public function getSqlFile(array $addColumns, array $addValues): void
