@@ -41,15 +41,16 @@
       "enabled": false
     }
   },
+  "autoload": {
+    "psr-4": {
+      "HtmlAcademy\\": "src/",
+      "frontend\\": "frontend/"
+    }
+  },
   "repositories": [
     {
       "type": "composer",
       "url": "https://asset-packagist.org"
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "HtmlAcademy\\": "frontend/"
-    }
-  }
+  ]
 }
