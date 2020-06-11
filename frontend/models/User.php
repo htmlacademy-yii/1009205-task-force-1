@@ -177,7 +177,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getUserInformations()
     {
-        return $this->hasMany(UserInformation::className(), ['user_id' => 'id']);
+        return $this->hasOne(UserInformation::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -218,5 +218,10 @@ class User extends \yii\db\ActiveRecord
     public function getUserTasksdonePhotos()
     {
         return $this->hasMany(UserTasksdonePhoto::className(), ['user_id' => 'id']);
+    }
+
+    public function getAverageRate()
+    {
+        return $this->hasMany(TaskReview::className(), ['executor_id' => 'id'])->average('rate');
     }
 }
